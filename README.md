@@ -35,6 +35,7 @@ Utiizou-se a placa BitDogLab (que possui o microcontrolador RP2040) para a exibi
 - O display OLED possui um quadrado 8x8 que é controlado pelo joystick (conversor analógico-digital nos eixos X e Y);
 - O LED RGB (cores vermelhas e azuis) são controladas pela iteração ADC-PWM, tendo seus máximos nos extremos (valor wrap 0 - 4095);
 - O LED RGB verde é ligado por meio do botão do joystick (GPIO 22), que também aciona uma borda variável;
+- O botão A (GPIO 5) controla o pwm, habilitando e desabilitando a sua mudança de valor de duty cicle;
 - O PWM possui uma verificação de deadzone, que é uma área em qual o valor do pwm é setado para 0 e é próximo do valor adc de 2047;
 - Houve a implementação de debounce e interrupções para os botões.
 
