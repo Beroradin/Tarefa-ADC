@@ -41,7 +41,7 @@ absolute_time_t last_interrupt_time = 0;
 // Variáveis para posição do quadrado
 int pos_x = (DISPLAY_WIDTH - SQUARE_SIZE) / 2;  // Centraliza horizontalmente
 int pos_y = (DISPLAY_HEIGHT - SQUARE_SIZE) / 2; // Centraliza verticalmente
-const int SPEED = 1;
+const int SPEED = 1;  // Velocidade do quadrado
 const int MAX_X = DISPLAY_WIDTH - SQUARE_SIZE;  // Limite direito
 const int MAX_Y = DISPLAY_HEIGHT - SQUARE_SIZE; // Limite inferior
 
@@ -50,7 +50,7 @@ void gpio_callback(uint gpio, uint32_t events);
 void leitura_e_controle_joystick(uint slice1, uint slice2);
 
 int main() {
-    // I2C Initialisation. Using it at 400Khz.
+    // Inicialização do i2c
     i2c_init(I2C_PORT, 400 * 5000);
 
     gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
@@ -108,10 +108,10 @@ int main() {
         // Limpa e redesenha o display
         ssd1306_fill(&ssd, false);
         if (borda_style){
-            ssd1306_rect(&ssd, 3, 3, 122, 58, cor, !cor);  // Borda
+            ssd1306_rect(&ssd, 3, 3, 122, 58, cor, !cor);  // borda variável
         }
         else{
-            ssd1306_rect(&ssd, 3, 3, 122, 58, true, false);  // Borda
+            ssd1306_rect(&ssd, 3, 3, 122, 58, true, false);  // borda fixa
         }
         ssd1306_rect(&ssd, pos_y, pos_x, SQUARE_SIZE, SQUARE_SIZE, true, true);  // Quadrado
         ssd1306_send_data(&ssd);
@@ -140,12 +140,12 @@ void gpio_callback(uint gpio, uint32_t events) {
 
 void leitura_e_controle_joystick(uint slice1, uint slice2) {
     const uint16_t CENTER = 2047;
-    const uint16_t DEADZONE = 170;
+    const uint16_t DEADZONE = 170;  // Valor empírico da deadzone do joystick
 
-    adc_select_input(0);
+    adc_select_input(0);  // Verifica o canal 1
     uint16_t y_value = adc_read();
     
-    adc_select_input(1);
+    adc_select_input(1);  // Verifica o canal 2
     uint16_t x_value = adc_read();
 
     int16_t y_diff = (int16_t)y_value - CENTER;
@@ -159,11 +159,11 @@ void leitura_e_controle_joystick(uint slice1, uint slice2) {
     
     // Corrigindo o movimento no eixo Y (movimento vertical)
     if (abs(y_diff) > DEADZONE) {
-        pos_y += (y_diff > 0) ? -SPEED : SPEED;  // Invertido aqui
+        pos_y += (y_diff > 0) ? -SPEED : SPEED;  
         pos_y = (pos_y < 0) ? 0 : (pos_y > MAX_Y) ? MAX_Y : pos_y;
     }
 
-    // Mantendo o PWM como estava
+    // Verificação do pwm em relação a deadzone
     uint16_t pwm_y = (abs(y_diff) <= DEADZONE) ? 0 : abs(y_diff) * 2;
     uint16_t pwm_x = (abs(x_diff) <= DEADZONE) ? 0 : abs(x_diff) * 2;
 
